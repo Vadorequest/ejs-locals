@@ -473,4 +473,5 @@ function stylesheet(path, media) {
   return this;
 }
 
-partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
+// My own tests.
+//partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
