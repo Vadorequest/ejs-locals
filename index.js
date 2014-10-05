@@ -207,6 +207,17 @@ function lookup(root, partial, options){
   var dir = dirname(partial)
     , base = basename(partial, ext);
 
+  // If _basePath is provided then load the file using non-relative path.
+  if(options._basePath){
+    partial = resolve(root, options._basePath, partial);
+    if( exists(partial) ){
+      // Update the key to ensure it's unique.
+      key = [ options._basePath, partial, ext ].join('-');
+
+      return options.cache ? cache[key] = partial : partial;
+    }
+  }
+
   // _ prefix takes precedence over the direct path
   // ex: for partial('user') look for /root/_user.ejs
   partial = resolve(root, dir,'_'+base+ext);
@@ -462,4 +473,4 @@ function stylesheet(path, media) {
   return this;
 }
 
-partial('box.ejs', {box_title: 'test'})
+partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
