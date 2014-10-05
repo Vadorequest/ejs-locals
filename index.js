@@ -100,8 +100,12 @@ var renderFile = module.exports = function(file, options, fn){
 
     if (layout) {
 
+      if(!options || !options.settings){
+          options.settings = {};
+      }
+
       // use default extension
-      var engine = options && options.settings && options.settings['view engine'] ? options.settings['view engine'] : 'ejs',
+      var engine = options.settings['view engine'] ? options.settings['view engine'] : 'ejs',
           desiredExt = '.'+engine;
 
       // apply default layout if only "true" was set
