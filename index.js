@@ -101,7 +101,7 @@ var renderFile = module.exports = function(file, options, fn){
     if (layout) {
 
       // use default extension
-      var engine = options.settings['view engine'] || 'ejs',
+      var engine = options && options.settings && options.settings['view engine'] ? options.settings['view engine'] : 'ejs',
           desiredExt = '.'+engine;
 
       // apply default layout if only "true" was set
@@ -454,3 +454,4 @@ function stylesheet(path, media) {
   return this;
 }
 
+partial('box.ejs', {box_title: 'test'})
