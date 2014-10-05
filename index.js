@@ -207,12 +207,13 @@ function lookup(root, partial, options){
   var dir = dirname(partial)
     , base = basename(partial, ext);
 
-  // If _basePath is provided then load the file using non-relative path.
-  if(options._basePath){
-    partial = resolve(root, options._basePath, partial);
+  // If options_basePath is provided or if a global __config.path.base is available and options._useAbsolute is true then load the file using non-relative path.
+  var basePath = options._basePath ? options._basePath : __config && __config.path && __config.path.base && options._useAbsolute == true ? __config.path.base : false;
+  if(basePath){
+    partial = resolve(root, basePath, partial);
     if( exists(partial) ){
       // Update the key to ensure it's unique.
-      key = [ options._basePath, partial, ext ].join('-');
+      key = [ basePath, partial, ext ].join('-');
 
       return options.cache ? cache[key] = partial : partial;
     }
@@ -474,4 +475,21 @@ function stylesheet(path, media) {
 }
 
 // My own tests.
-//partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
+
+// A global __config object can be used to always set the basePath by default.
+/*
+var __config = {
+  path: {
+    base: __dirname
+  }
+};
+
+// use the relative path from the current directory.
+partial('test/fixtures/partials/box.ejs', {box_title: 'test'})
+
+// Use the absolute path provided by _basePath
+partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
+
+// Use the absolute path provided by __config.path.base
+partial('test/fixtures/partials/box.ejs', {_useAbsolute: true, box_title: 'test'})
+*/
