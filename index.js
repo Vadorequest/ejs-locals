@@ -101,12 +101,12 @@ var renderFile = module.exports = function(file, options, fn){
     if (layout) {
 
       if(!options || !options.settings){
-          options.settings = {};
+        options.settings = {};
       }
 
       // use default extension
       var engine = options.settings['view engine'] ? options.settings['view engine'] : 'ejs',
-          desiredExt = '.'+engine;
+        desiredExt = '.'+engine;
 
       // apply default layout if only "true" was set
       if (layout === true) {
@@ -293,6 +293,10 @@ function partial(view, options){
     }
   } else {
     options = {};
+  }
+
+  if(!options.settings){
+    options.settings = {};
   }
 
   // merge locals into options
