@@ -8,7 +8,8 @@ var ejs = require('ejs')
   , extname = path.extname
   , dirname = path.dirname
   , join = path.join
-  , basename = path.basename;
+  , basename = path.basename
+  , Block = require('./app/lib/Block').Block;
 
 /**
  * Express 3.x Layout & Partial support for EJS.
@@ -414,52 +415,6 @@ function layout(view){
 }
 
 /**
- * A Block object, used to store HTML content in order to display it anywhere.
- * @constructor
- */
-function Block() {
-  this.html = [];
-}
-
-/**
- * Append function to the Block object by prototype.
- */
-Block.prototype = {
-
-  /**
-   * Convert HTML to string.
-   * @return {string}
-   */
-  toString: function() {
-    return this.html.join('\n');
-  },
-
-  /**
-   * Append a new HTML block.
-   * @param more
-   */
-  append: function(more) {
-    this.html.push(more);
-  },
-
-  /**
-   * Prepend an HTML block, so it's like append it but at the beginning of the array.
-   * @param more
-   */
-  prepend: function(more) {
-    this.html.unshift(more);
-  },
-
-  /**
-   * Replace the whole HTML block by a new array.
-   * @param instead
-   */
-  replace: function(instead) {
-    this.html = [ instead ];
-  }
-};
-
-/**
  * Return the block with the given name, create it if necessary.
  * Optionally append the given html to the block.
  *
@@ -520,3 +475,32 @@ function stylesheet(path, media) {
   }
   return this;
 }
+
+
+// My own tests.
+
+// A global __config object can be used to always set the basePath by default.
+/*
+ var __config = {
+ path: {
+ base: __dirname
+ }
+ };
+
+ // use the relative path from the current directory.
+ partial('test/fixtures/partials/box.ejs', {box_title: 'test'})
+
+ // Use the absolute path provided by _basePath
+ partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
+
+ // Use the absolute path provided by __config.path.base
+ partial('test/fixtures/partials/box.ejs', {_useAbsolute: true, box_title: 'test'})
+ */
+var __config = {
+  path: {
+    base: __dirname
+  }
+};
+
+// use the relative path from the current directory.
+partial('test/fixtures/partials/box.ejs', {box_title: 'test'})
