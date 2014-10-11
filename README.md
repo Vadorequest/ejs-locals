@@ -2,8 +2,8 @@
 
 ## Status
 
-This library is *unmaintained*, sorry. I recommend a fully-featured and actively-maintained 
-alternative such as https://github.com/linkedin/dustjs or https://github.com/baryshev/ect
+This is my own library for `ejs-locals` from https://github.com/RandomEtc/ejs-locals.
+The original lib is unmaintained so I'll make some improvements, mostly based on what I need since I don't understand exactly how everything works there.
 
 ## About
 
