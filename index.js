@@ -18,6 +18,7 @@ var ejs = require('ejs')
 /**
  * Load helpers.
  */
+require('./app/helpers/block');
 require('./app/helpers/layout');
 
 /**
@@ -405,32 +406,6 @@ function partial(view, options){
   } else {
     return render();
   }
-}
-
-/**
- * Return the block with the given name, create it if necessary.
- * Optionally append the given html to the block.
- *
- * The returned Block can append, prepend or replace the block,
- * as well as render it when included in a parent template.
- *
- * @param  {String} name
- * @param  {String} html
- * @return {Block}
- * @api private
- */
-function block(name, html) {
-  // bound to the blocks object in renderFile
-  var blk = this[name];
-  if (!blk) {
-    // always create, so if we request a
-    // non-existent block we'll get a new one
-    blk = this[name] = new Block();
-  }
-  if (html) {
-    blk.append(html);
-  }
-  return blk;
 }
 
 // My own tests.
