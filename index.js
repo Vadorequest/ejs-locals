@@ -9,7 +9,16 @@ var ejs = require('ejs')
   , dirname = path.dirname
   , join = path.join
   , basename = path.basename
-  , Block = require('./app/lib/Block').Block;
+  , Block = require('./app/lib/Block').Block
+  , Stylesheet = require('./app/lib/Stylesheet').Stylesheet
+  , stylesheet = new Stylesheet().stylesheet
+  , Script = require('./app/lib/Script').Script
+  , script = new Script().script;
+
+/**
+ * Load helpers.
+ */
+require('./app/helpers/layout');
 
 /**
  * Express 3.x Layout & Partial support for EJS.
@@ -72,10 +81,10 @@ var renderFile = module.exports = function(file, options, fn){
 
   if (!options.locals.blocks) {
     // one set of blocks no matter how often we recurse
-    var blocks = { scripts: new Block(), stylesheets: new Block() };
+    var blocks = { scripts: new Script(), stylesheets: new Stylesheet() };
     options.locals.blocks = blocks;
-    options.locals.scripts = blocks.scripts;
-    options.locals.stylesheets = blocks.stylesheets;
+    options.locals.scripts = blocks.scripts.block;
+    options.locals.stylesheets = blocks.stylesheets.block;
     options.locals.block = block.bind(blocks);
     options.locals.stylesheet = stylesheet.bind(blocks.stylesheets);
     options.locals.script = script.bind(blocks.scripts);
@@ -399,22 +408,6 @@ function partial(view, options){
 }
 
 /**
- * Apply the given `view` as the layout for the current template,
- * using the current options/locals. The current template will be
- * supplied to the given `view` as `body`, along with any `blocks`
- * added by child templates.
- *
- * `options` are bound  to `this` in renderFile, you just call
- * `layout('myview')`
- *
- * @param  {String} view
- * @api private
- */
-function layout(view){
-  this.locals._layoutFile = view;
-}
-
-/**
  * Return the block with the given name, create it if necessary.
  * Optionally append the given html to the block.
  *
@@ -439,43 +432,6 @@ function block(name, html) {
   }
   return blk;
 }
-
-/**
- * A convenience function for `block('scripts', '<script src="src.js"></script>')` with optional type.
- * When called anywhere inside a template, adds a script tag with the given src/type to the scripts block.
- * In the layout you can then do `<%-scripts%> to output the scripts from all the child templates.
- * This function in bound to the scripts Block from the `renderFile` function.
- *
- * @param path
- * @param media
- * @return {script}
- * @api public
- */
-function script(path, type) {
-  if (path) {
-    this.append('<script src="'+path+'"'+(type ? 'type="'+type+'"' : '')+'></script>');
-  }
-  return this;
-}
-
-/**
- * A convenience function for `block('stylesheets', '<link rel="stylesheet" href="href.css" />')` with optional media type.
- * When called anywhere inside a template, adds a link tag for the stylesheet with the given href/media to the stylesheets block.
- * In the layout you can then do `<%-stylesheets%> to output the links from all the child templates.
- * This function in bound to the stylesheets Block from the `renderFile` function.
- *
- * @param path
- * @param media
- * @return {stylesheet}
- * @api public
- */
-function stylesheet(path, media) {
-  if (path) {
-    this.append('<link rel="stylesheet" href="'+path+'"'+(media ? 'media="'+media+'"' : '')+' />');
-  }
-  return this;
-}
-
 
 // My own tests.
 
@@ -502,5 +458,5 @@ var __config = {
   }
 };
 
-// use the relative path from the current directory.
-partial('test/fixtures/partials/box.ejs', {box_title: 'test'})
+renderFile('example/views/index.ejs', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ] }, function(err, html){
+});
