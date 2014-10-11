@@ -59,7 +59,6 @@ var ejs = require('ejs')
  *   </html>
  *
  */
-
 var renderFile = module.exports = function(file, options, fn){
 
   // Express used to set options.locals for us, but now we do it ourselves
@@ -85,6 +84,7 @@ var renderFile = module.exports = function(file, options, fn){
   ejs.renderFile(file, options, function(err, html) {
 
     if (err) {
+      // TODO Improve exceptions?
       return fn(err,html);
     }
 
@@ -160,7 +160,6 @@ var cache = {};
  * @return {String}
  * @api private
  */
-
 function resolveObjectName(view){
   return cache[view] || (cache[view] = view
     .split('/')
@@ -192,7 +191,6 @@ function resolveObjectName(view){
  * @return {String}
  * @api private
  */
-
 function lookup(root, partial, options){
 
   var engine = options.settings['view engine'] || 'ejs'
@@ -413,20 +411,47 @@ function layout(view){
   this.locals._layoutFile = view;
 }
 
+/**
+ * A Block object, used to store HTML content in order to display it anywhere.
+ * @constructor
+ */
 function Block() {
   this.html = [];
 }
 
+/**
+ * Append function to the Block object by prototype.
+ */
 Block.prototype = {
+
+  /**
+   * Convert HTML to string.
+   * @return {string}
+   */
   toString: function() {
     return this.html.join('\n');
   },
+
+  /**
+   * Append a new HTML block.
+   * @param more
+   */
   append: function(more) {
     this.html.push(more);
   },
+
+  /**
+   * Prepend an HTML block, so it's like append it but at the beginning of the array.
+   * @param more
+   */
   prepend: function(more) {
     this.html.unshift(more);
   },
+
+  /**
+   * Replace the whole HTML block by a new array.
+   * @param instead
+   */
   replace: function(instead) {
     this.html = [ instead ];
   }
@@ -458,7 +483,17 @@ function block(name, html) {
   return blk;
 }
 
-// bound to scripts Block in renderFile
+/**
+ * A convenience function for `block('scripts', '<script src="src.js"></script>')` with optional type.
+ * When called anywhere inside a template, adds a script tag with the given src/type to the scripts block.
+ * In the layout you can then do `<%-scripts%> to output the scripts from all the child templates.
+ * This function in bound to the scripts Block from the `renderFile` function.
+ *
+ * @param path
+ * @param media
+ * @return {stylesheet}
+ * @api public
+ */
 function script(path, type) {
   if (path) {
     this.append('<script src="'+path+'"'+(type ? 'type="'+type+'"' : '')+'></script>');
@@ -466,30 +501,20 @@ function script(path, type) {
   return this;
 }
 
-// bound to stylesheets Block in renderFile
+/**
+ * A convenience function for `block('stylesheets', '<link rel="stylesheet" href="href.css" />')` with optional media type.
+ * When called anywhere inside a template, adds a link tag for the stylesheet with the given href/media to the stylesheets block.
+ * In the layout you can then do `<%-stylesheets%> to output the links from all the child templates.
+ * This function in bound to the stylesheets Block from the `renderFile` function.
+ *
+ * @param path
+ * @param media
+ * @return {stylesheet}
+ * @api public
+ */
 function stylesheet(path, media) {
   if (path) {
     this.append('<link rel="stylesheet" href="'+path+'"'+(media ? 'media="'+media+'"' : '')+' />');
   }
   return this;
 }
-
-// My own tests.
-
-// A global __config object can be used to always set the basePath by default.
-/*
-var __config = {
-  path: {
-    base: __dirname
-  }
-};
-
-// use the relative path from the current directory.
-partial('test/fixtures/partials/box.ejs', {box_title: 'test'})
-
-// Use the absolute path provided by _basePath
-partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
-
-// Use the absolute path provided by __config.path.base
-partial('test/fixtures/partials/box.ejs', {_useAbsolute: true, box_title: 'test'})
-*/
