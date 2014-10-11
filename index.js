@@ -281,7 +281,6 @@ function lookup(root, partial, options){
  * @return {String}
  * @api private
  */
-
 function partial(view, options){
 
   var collection
