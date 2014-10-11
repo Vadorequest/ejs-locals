@@ -1,20 +1,28 @@
-<% layout('boilerplate') -%>
+<% layout('layouts/boilerplate') -%>
 <% script('/foo.js') -%>
 <% stylesheet('/foo.css') -%>
 
-<h1>I am the <%=what%> template</h1>
+<h1>I am the <%= what %> template</h1>
 
-<p class="better-than-dead">I'm red if foo.css was loaded.</p>
+<!-- Using include will make any use of the partial function bug using relative paths. Much better to use partial actually. -->
+<% include partials/included %>
+
+<%- partial('partials/relative') %>
+<%- partial('/views/partials/absolute', {_basePath: _basePath}) %>
+
+<hr/>
+
 <p>Here are some muppets we know about:
     <ul>
-        <%-partial('muppet',muppets) %>
+        <%- partial('partials/muppet', muppets) %>
     </ul>
 </p>
 
-<% include extra %>
-
-<%- partial('relative') %>
-<%- partial('/views/absolute', {_basePath: _basePath}) %>
+<%- partial('partials/extra') %>
 
 <% block('header', "<p>I'm in the header.</p>") %>
 <% block('footer', "<p>I'm in the footer.</p>") %>
+
+<hr/>
+
+<p class="better-than-dead">I'm red if foo.css was loaded.</p>
