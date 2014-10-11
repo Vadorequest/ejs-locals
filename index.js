@@ -1,3 +1,5 @@
+// TODO obliger l'utilisation de `/` en premier caractère pour utiliser le mode absolute. Supprimer `_useAbsolute` et le surcharger lorsque `_basePath` est foruni.
+
 var ejs = require('ejs')
   , fs = require('fs')
   , path = require('path')
