@@ -410,28 +410,8 @@ function partial(view, options){
 
 // My own tests.
 
-// A global __config object can be used to always set the basePath by default.
-/*
- var __config = {
- path: {
- base: __dirname
- }
- };
-
- // use the relative path from the current directory.
- partial('test/fixtures/partials/box.ejs', {box_title: 'test'})
-
- // Use the absolute path provided by _basePath
- partial('test/fixtures/partials/box.ejs', {_basePath: __dirname, box_title: 'test'})
-
- // Use the absolute path provided by __config.path.base
- partial('test/fixtures/partials/box.ejs', {_useAbsolute: true, box_title: 'test'})
- */
 var __config = {
   path: {
     base: __dirname
   }
 };
-
-renderFile('example/views/index.ejs', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ] }, function(err, html){
-});
