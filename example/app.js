@@ -11,7 +11,7 @@ app.set('view engine', 'ejs'); // so you can render('index')
 
 // render 'index' into 'boilerplate':
 app.get('/',function(req, res, next){
-  res.render('index', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ] });
+  res.render('index', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ], _basePath: __dirname });
 });
 
 /**

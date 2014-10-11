@@ -1,5 +1,3 @@
-// TODO obliger l'utilisation de `/` en premier caractère pour utiliser le mode absolute. Supprimer `_useAbsolute` et le surcharger lorsque `_basePath` est foruni.
-
 var ejs = require('ejs')
   , fs = require('fs')
   , path = require('path')
@@ -218,15 +216,23 @@ function lookup(root, partial, options){
   var dir = dirname(partial)
     , base = basename(partial, ext);
 
-  // If options_basePath is provided or if a global __config.path.base is available and options._useAbsolute is true then load the file using non-relative path.
-  var basePath = options._basePath ? options._basePath : __config && __config.path && __config.path.base && options._useAbsolute == true ? __config.path.base : false;
-  if(basePath){
-    partial = resolve(root, basePath, partial);
-    if( exists(partial) ){
-      // Update the key to ensure it's unique.
-      key = [ basePath, partial, ext ].join('-');
+  // If the first char of the partial path is a slash (/) then try to load the file using the absolute mode.
+  if(partial.substr(0, 1) == '/'){
 
-      return options.cache ? cache[key] = partial : partial;
+    // Delete the first character, it is required just to know if we should load an absolute path but would mess up what's next if we don't remove it..
+    partial = partial.substr(1);
+
+    // If options._basePath is provided then load the file using non-relative path.
+    if(options._basePath){
+      partial = resolve(options._basePath, partial);
+      if( exists(partial) ){
+        // Update the key to ensure it's unique.
+        key = [ options._basePath, partial, ext ].join('-');
+
+        return options.cache ? cache[key] = partial : partial;
+      }
+    }else{
+      throw new Error('You need to set a _basePath attribute to load a file using absolute path.');
     }
   }
 
@@ -406,11 +412,3 @@ function partial(view, options){
     return render();
   }
 }
-
-// My own tests.
-
-var __config = {
-  path: {
-    base: __dirname
-  }
-};
