@@ -491,7 +491,7 @@ function block(name, html) {
  *
  * @param path
  * @param media
- * @return {stylesheet}
+ * @return {script}
  * @api public
  */
 function script(path, type) {
