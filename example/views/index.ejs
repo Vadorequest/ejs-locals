@@ -13,8 +13,8 @@
 
 <% include extra %>
 
-<%- partial('relative.ejs') %>
-<%- partial('/views/absolute.ejs', {_basePath: _basePath}) %>
+<%- partial('relative') %>
+<%- partial('/views/absolute', {_basePath: _basePath}) %>
 
 <% block('header', "<p>I'm in the header.</p>") %>
 <% block('footer', "<p>I'm in the footer.</p>") %>

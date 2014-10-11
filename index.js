@@ -88,6 +88,7 @@ var renderFile = module.exports = function(file, options, fn){
     options.locals.stylesheet = stylesheet.bind(blocks.stylesheets);
     options.locals.script = script.bind(blocks.scripts);
   }
+
   // override locals for layout/partial bound to current options
   options.locals.layout  = layout.bind(options);
   options.locals.partial = partial.bind(options);
@@ -130,6 +131,7 @@ var renderFile = module.exports = function(file, options, fn){
       // clear to make sure we don't recurse forever (layouts can be nested)
       delete options.locals._layoutFile;
       delete options._layoutFile;
+
       // make sure caching works inside ejs.renderFile/render
       delete options.filename;
 
@@ -207,7 +209,7 @@ function lookup(root, partial, options){
   var engine = options.settings['view engine'] || 'ejs'
     , desiredExt = '.' + engine
     , ext = extname(partial) || desiredExt
-    , key = [ root, partial, ext ].join('-');
+    , key = [ root, options._basePath ? options._basePath : '', partial, ext ].join('-');
 
   if (options.cache && cache[key]) return cache[key];
 
@@ -224,11 +226,9 @@ function lookup(root, partial, options){
 
     // If options._basePath is provided then load the file using non-relative path.
     if(options._basePath){
-      partial = resolve(options._basePath, partial);
-      if( exists(partial) ){
-        // Update the key to ensure it's unique.
-        key = [ options._basePath, partial, ext ].join('-');
+      partial = resolve(options._basePath, partial + ext);
 
+      if( exists(partial) ){
         return options.cache ? cache[key] = partial : partial;
       }
     }else{
@@ -300,6 +300,7 @@ function partial(view, options){
     if( options.collection ){
       collection = options.collection;
       delete options.collection;
+
     } else if( 'length' in options ){
       collection = options;
       options = {};
@@ -315,6 +316,7 @@ function partial(view, options){
     if( 'Object' != options.constructor.name ){
       object = options;
       options = {};
+
     } else if( options.object !== undefined ){
       object = options.object;
       delete options.object;
@@ -343,6 +345,7 @@ function partial(view, options){
   var root = dirname(options.filename)
     , file = lookup(root, view, options)
     , key = file + ':string';
+
   if( !file )
     throw new Error('Could not find partial ' + view);
 
@@ -395,6 +398,7 @@ function partial(view, options){
       len = keys.length;
       options.collectionLength = len;
       options.collectionKeys = keys;
+
       for (i = 0; i < len; ++i) {
         prop = keys[i];
         val = collection[prop];
