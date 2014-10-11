@@ -122,7 +122,6 @@ If you wish not to have to precise the `_basePath` every time, you can set it in
     };
 ```
 
-
 Then you would only need to precise you want to use the global value:
 `views/partials/foo.ejs', {_useAbsolute: true})`
 
