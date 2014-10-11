@@ -15,14 +15,23 @@ var Script = (function () {
     * In the layout you can then do `<%-scripts%> to output the scripts from all the child templates.
     * This function in bound to the scripts Block from the `renderFile` function.
     *
-    * @param path
-    * @param type
+    * @param path          Path of the file.
+    * @param attributes    If string, must contains the type, if object then wrap all attributes. [text/javascript]
     * @return {Script}
     */
-    Script.prototype.script = function (path, type) {
-        if (typeof type === "undefined") { type = 'text/javascript'; }
+    Script.prototype.script = function (path, attributes) {
+        if (typeof attributes === "undefined") { attributes = 'text/javascript'; }
         if (path) {
-            this.block.append('<script src="' + path + '"' + type + '></script>');
+            var text = '<script src="' + path + '"';
+            if (typeof attributes == 'string' && attributes !== '') {
+                text += ' type="' + attributes + '"';
+            } else if (typeof attributes == 'object') {
+                for (var attr in attributes) {
+                    text += ' ' + attr + '="' + attributes[attr] + '"';
+                }
+            }
+            text += '></script>';
+            this.block.append(text);
         }
         return this;
     };

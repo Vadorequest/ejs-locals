@@ -16,13 +16,22 @@ export class Stylesheet {
      * In the layout you can then do `<%-stylesheets%> to output the links from all the child templates.
      * This function in bound to the stylesheets Block from the `renderFile` function.
      *
-     * @param path
-     * @param media
+     * @param path          Path of the file.
+     * @param attributes    If string, must contains the media, if object then wrap all attributes. [text/javascript]
      * @return {stylesheet}
      */
-    public stylesheet(path, media = '') {
+    public stylesheet(path, attributes: any = '') {
         if (path) {
-            this.block.append('<link rel="stylesheet" href="' + path + '"' + media + ' />');
+            var text = '<link rel="stylesheet" href="'+path+'"';
+            if (typeof attributes == 'string' && attributes !== '') {
+                text += ' media="'+attributes+'"';
+            } else if (typeof attributes == 'object'){
+                for (var attr in attributes) {
+                    text += ' ' + attr + '="' + attributes[attr] + '"';
+                }
+            }
+            text += '></script>';
+            this.block.append(text);
         }
         return this;
     }
