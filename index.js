@@ -226,18 +226,23 @@ function lookup(root, partial, options){
   // If the first char of the partial path is a slash (/) then try to load the file using the absolute mode.
   if(partial.substr(0, 1) == '/'){
 
-    // Delete the first character, it is required just to know if we should load an absolute path but would mess up what's next if we don't remove it..
+    // Delete the first character, it is required just to know if we should load an absolute path but would mess up the fall back with relative path if we don't remove it..
     partial = partial.substr(1);
 
-    // If options._basePath is provided then load the file using non-relative path.
-    if(options._basePath){
-      partial = resolve(options._basePath, partial + ext);
+    var file;
 
-      if( exists(partial) ){
-        return options.cache ? cache[key] = partial : partial;
+    // Try to resolve using default config.
+    file = resolve(_getDefaultLoadPath(options), partial + ext);
+    if( exists(file) ){
+      return options.cache ? cache[key] = file : file;
+    }
+
+    // Try to resolve using options._basePath, if set.
+    if(options._basePath){
+      file = resolve(options._basePath, partial + ext);
+      if( exists(file) ){
+        return options.cache ? cache[key] = file : file;
       }
-    }else{
-      throw new Error('You need to set a _basePath attribute to load a file using absolute path.');
     }
   }
 
@@ -358,7 +363,7 @@ function partial(view, options){
 
   // find view, relative to this filename
   // (FIXME: filename is set by ejs engine, other engines may need more help)
-  var root = (options.settings.views || process.cwd() + '/views')
+  var root = _getDefaultLoadPath(options)
     , file = lookup(root, view, options)
     , key = file + ':string';
 
@@ -431,4 +436,8 @@ function partial(view, options){
   } else {
     return render();
   }
+}
+
+function _getDefaultLoadPath(options){
+  return (options.settings.views || process.cwd() + '/views');
 }
