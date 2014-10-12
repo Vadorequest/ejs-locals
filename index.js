@@ -365,7 +365,6 @@ function partial(view, options){
   name = options.as || resolveObjectName(view);
 
   // find view, relative to this filename
-  // (FIXME: filename is set by ejs engine, other engines may need more help)
   var root = join(_getDefaultLoadPath(options), view.slice(1))
     , file = lookup(root, view, options)
     , key = file + ':string';
