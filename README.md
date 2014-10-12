@@ -4,7 +4,9 @@
 This is my own library for `ejs-locals` from https://github.com/RandomEtc/ejs-locals.
 The original lib is unmaintained so I have made some improvements, mostly based on what I need since I don't understand exactly how everything works there.
 
-Anyway, if you want small edit/features I should be able to do it, just open an issue. Or better: **Make a PR**. (see **Contributing.md**)
+Anyway, if you want small edit/features I should be able to do it, just open an issue.
+
+Or better: **Make a PR**. (see **Contributing.md**)
 
 ## About
 Express 3.x `layout`, `partial` and `block` template functions for the EJS template engine.
@@ -119,7 +121,7 @@ When rendered by an Express 3.0 app, `app.js`:
     app.listen(3000);
 ```
 
-You get the following result:
+You get the following result: (See [Picture](rendered.png))
 
 ```html
 
@@ -273,6 +275,8 @@ In order to help developers using this library I have made a couple of changes:
 
 - Every successful partial found is written in the server console as `log`. If I can understand that it could be boring due to a lot of views loaded,
 I prefer doing so for the moment so we are able to see if the file loaded is the one we want to, especially now that I don't trust the lookup system 100%.
+Feel free to make a PR with some kind of settings to disable it, I didn't get any idea other than checking the `environment` but I would like to have log in production too,
+I don't think that's the best way. We need something independent, not related to the env.
 - When a file to load fails to be found, all paths tested are now displayed in the server console as `error`.
 
 ## Template Support
