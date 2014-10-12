@@ -26,7 +26,8 @@ Previously also offered `include` but you should use EJS 0.8.x's own method for 
 If you want to use a smart and reusable `absolute path`, here is how **it should be done**.
 
 #### Using Express.js
-This is the smarter solution. Just set the following when setting your `express` application: `app.set('views', __dirname + '/views')` even if I guess that's already done!
+**This is the smarter solution.** Just set the following when setting your `express` application: `app.set('views', __dirname + '/views')` even if I guess that's already done!
+
 Every use of absolute path (I.e: `partial('/partials/absolute')` will take the `views` folder as root.
 
 #### Without Express.js
@@ -42,7 +43,7 @@ Run `node app.js` from `examples` folder and open `localhost:3000` to see a work
 
 Given a template, `views/index.ejs`:
 
-```
+```js
 
     <% layout('layouts/boilerplate') -%>
     <% script('/foo.js') -%>
@@ -112,7 +113,7 @@ And a layout, `views/layouts/boilerplate.ejs`:
 
 When rendered by an Express 3.0 app, `app.js`:
 
-```
+```js
 
     var express = require('express')
       , ejsLocals = require('../')
@@ -182,12 +183,13 @@ There is a specific order while trying to resolve a path using the `partial` fun
 
 1. `c:\wamp\www\ejs-locals\example\partials\absolute.ejs` (not tested) (would be tested only if `_basePath` is **bind** to the view (in `locals._basePath`), or when calling the `partial` function like: `partial('/partials/absolute', {_basePath: your_base_path)`)
 2. `c:\wamp\www\ejs-locals\example\views\partials\absolute.ejs` (succeed)
+3. `c:\partials\_absolute.ejs` (not tested) fallback relative
+4. `c:\partials\absolute.ejs` (not tested) fallback relative
+5. `c:\partials\absolute\index.ejs` (not tested) fallback relative
 
-If the *absolute path fails*, then there is a **fallback** with **relative path** based on the **`express` configuration** or **default configuration**.
+As you can see, the **fallback** here isn't really useful. I actually don't know if I should improve it or not, and I don't know how to. It's kinda hard to fallback from absolute to relative and I'm afraid the program would be wrong most of the time actually.
 
-3. `c:\partials\_absolute.ejs` (failed)
-4. `c:\partials\absolute.ejs` (succeed)
-5. `c:\partials\absolute\index.ejs` (succeed)
+So, probably better this way, or completely remove fallback from absolute to relative paths. Feel free to guide me here.
 
 
 #### Load partial with relative path
