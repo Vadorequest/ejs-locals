@@ -1,16 +1,13 @@
 {
-  "author": "Tom Carden <tom@tom-carden.co.uk>",
-  "contributors": [
-    "Robert Sköld <robert@publicclass.se> (http://publicclass.se)"
-  ],
-  "name": "ejs-locals",
+  "author": "Vadorequest",
+  "name": "ejs-locals-vadorequest",
   "description": "Express 3.x locals for layout, partial and blocks.",
   "version": "1.0.3",
   "repository": {
     "type": "git",
-    "url": "git://github.com/randometc/ejs-locals.git"
+    "url": "git://github.com/Vadorequest/ejs-locals"
   },
-  "homepage": "https://github.com/randometc/ejs-locals",
+  "homepage": "https://github.com/Vadorequest/ejs-locals",
   "engines": {
     "node": ">=0.6.0"
   },

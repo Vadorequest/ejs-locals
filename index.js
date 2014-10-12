@@ -6,7 +6,18 @@ var ejs = require('ejs')
   , extname = path.extname
   , dirname = path.dirname
   , join = path.join
-  , basename = path.basename;
+  , basename = path.basename
+  , Block = require('./app/lib/Block').Block
+  , Stylesheet = require('./app/lib/Stylesheet').Stylesheet
+  , stylesheet = new Stylesheet().stylesheet
+  , Script = require('./app/lib/Script').Script
+  , script = new Script().script;
+
+/**
+ * Load helpers.
+ */
+require('./app/helpers/block');
+require('./app/helpers/layout');
 
 /**
  * Express 3.x Layout & Partial support for EJS.
@@ -69,14 +80,16 @@ var renderFile = module.exports = function(file, options, fn){
 
   if (!options.locals.blocks) {
     // one set of blocks no matter how often we recurse
-    var blocks = { scripts: new Block(), stylesheets: new Block() };
+    var blocks = { scripts: new Script(), stylesheets: new Stylesheet() };
     options.locals.blocks = blocks;
-    options.locals.scripts = blocks.scripts;
-    options.locals.stylesheets = blocks.stylesheets;
+    options.locals.scripts = blocks.scripts.block;
+    options.locals.stylesheets = blocks.stylesheets.block;
     options.locals.block = block.bind(blocks);
     options.locals.stylesheet = stylesheet.bind(blocks.stylesheets);
     options.locals.script = script.bind(blocks.scripts);
+    options.locals._settings = options.settings;
   }
+
   // override locals for layout/partial bound to current options
   options.locals.layout  = layout.bind(options);
   options.locals.partial = partial.bind(options);
@@ -119,12 +132,13 @@ var renderFile = module.exports = function(file, options, fn){
       // clear to make sure we don't recurse forever (layouts can be nested)
       delete options.locals._layoutFile;
       delete options._layoutFile;
+
       // make sure caching works inside ejs.renderFile/render
       delete options.filename;
 
       if (layout.length > 0 && layout[0] === path.sep) {
         // if layout is an absolute path, find it relative to view options:
-        layout = join(options.settings.views, layout.slice(1));
+        layout = join(_getDefaultLoadPath(options), layout.slice(1));
       } else {
         // otherwise, find layout path relative to current template:
         layout = resolve(dirname(file), layout);
@@ -144,7 +158,6 @@ var renderFile = module.exports = function(file, options, fn){
 /**
  * Memory cache for resolved object names.
  */
-
 var cache = {};
 
 /**
@@ -185,18 +198,17 @@ function resolveObjectName(view){
  *
  *   - `cache` store the resolved path for the view, to avoid disk I/O
  *
- * @param {String} root, full base path of calling template
- * @param {String} partial, name of the partial to lookup (can be a relative path)
- * @param {Object} options, for `options.cache` behavior
+ * @param {String} root       full base path of calling template
+ * @param {String} partial    name of the partial to lookup (can be a relative path)
+ * @param {Object} options    for `options.cache` behavior
  * @return {String}
  * @api private
  */
 function lookup(root, partial, options){
-
   var engine = options.settings['view engine'] || 'ejs'
     , desiredExt = '.' + engine
     , ext = extname(partial) || desiredExt
-    , key = [ root, partial, ext ].join('-');
+    , key = [ root, options._basePath ? options._basePath : '', partial, ext ].join('-');
 
   if (options.cache && cache[key]) return cache[key];
 
@@ -205,32 +217,59 @@ function lookup(root, partial, options){
   var dir = dirname(partial)
     , base = basename(partial, ext);
 
-  // If options_basePath is provided or if a global __config.path.base is available and options._useAbsolute is true then load the file using non-relative path.
-  var basePath = options._basePath ? options._basePath : __config && __config.path && __config.path.base && options._useAbsolute == true ? __config.path.base : false;
-  if(basePath){
-    partial = resolve(root, basePath, partial);
-    if( exists(partial) ){
-      // Update the key to ensure it's unique.
-      key = [ basePath, partial, ext ].join('-');
+  // Clean the dir if it's not a real dir, it messes up the path.resolve.
+  if(dir == '/'){
+    dir = '';
+  }
 
-      return options.cache ? cache[key] = partial : partial;
+  // Delete any eventual extension equal to the view engine extension to makes sure that even a file loaded using "partial('foo.ejs')" works.
+  partial = (path.dirname(partial) !== '/' ? path.dirname(partial) + '/' : '/') + path.basename(partial, ext);
+
+  /**
+   * Try to resolve different kind of paths.
+   * Try absolute if partial name starts with "/" then fallback to different relative ways.
+   */
+
+  // If the first char of the partial path is a slash (/) then try to load the file using the absolute mode.
+  if(partial.substr(0, 1) == '/'){
+    // Delete the first character, it is required just to know if we should load an absolute path but would mess up the fall back with relative path if we don't remove it..
+    partial = partial.substr(1);
+
+    var file;
+
+    // Try to resolve using options._basePath, if set. Allows to override any kind of config, in case the path lookup wouldn't take the expected one.
+    if(options._basePath){
+      if(_fileExists(partial, file = resolve(options._basePath, partial + ext), 'absolute(_basePath)')){
+        return options.cache ? cache[key] = file : file
+      }
+    }
+
+    // Try to resolve using Express config or default config.
+    if(_fileExists(partial, file = resolve(_getDefaultLoadPath(options), partial + ext), 'absolute(default)')){
+      return options.cache ? cache[key] = file : file
     }
   }
 
-  // _ prefix takes precedence over the direct path
-  // ex: for partial('user') look for /root/_user.ejs
-  partial = resolve(root, dir,'_'+base+ext);
-  if( exists(partial) ) return options.cache ? cache[key] = partial : partial;
+  // filename is set by ejs engine
+  var relativeRoot = dirname(options.filename);
 
-  // Try the direct path
+  // Try relative partial with "_". Takes precedence over the direct path
   // ex: for partial('user') look for /root/user.ejs
-  partial = resolve(root, dir, base+ext);
-  if( exists(partial) ) return options.cache ? cache[key] = partial : partial;
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, '_' + base + ext), 'relative(_)')) {
+    return options.cache ? cache[key] = file : file
+  }
 
-  // Try index
-  // ex: for partial('user') look for /root/user/index.ejs
-  partial = resolve(root, dir, base, 'index'+ext);
-  if( exists(partial) ) return options.cache ? cache[key] = partial : partial;
+  // Try relative
+  // ex: for partial('user') look for /root/user.ejs
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, base + ext), 'relative(default)')) {
+    return options.cache ? cache[key] = file : file
+  }
+
+  // Try relative index
+  // ex: for partial('user') look for /root/user/index.ejs, but only if there is not /root/user.ejs
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, base, 'index' + ext), 'relative(index)')) {
+    return options.cache ? cache[key] = file : file
+  }
 
   // FIXME:
   // * there are other path types that Express 2.0 used to support but
@@ -245,6 +284,10 @@ function lookup(root, partial, options){
   return null;
 }
 
+/**
+ * Used to store and display paths that have been tried while lookup for a file.
+ */
+var partialUnresolvedPaths = new Array();
 
 /**
  * Render `view` partial with the given `options`. Optionally a
@@ -264,17 +307,18 @@ function lookup(root, partial, options){
  *     For example _video.html_ will have a object _video_ available to it.
  *
  * @param  {String} view
- * @param  {Object|Array} options, collection or object
+ * @param  {Object|Array} options   collection or object
  * @return {String}
  * @api private
  */
-
 function partial(view, options){
-
   var collection
     , object
     , locals
     , name;
+
+  // Reset the partialUnresolvedPaths array.
+  partialUnresolvedPaths = new Array();
 
   // parse options
   if( options ){
@@ -282,6 +326,7 @@ function partial(view, options){
     if( options.collection ){
       collection = options.collection;
       delete options.collection;
+
     } else if( 'length' in options ){
       collection = options;
       options = {};
@@ -297,6 +342,7 @@ function partial(view, options){
     if( 'Object' != options.constructor.name ){
       object = options;
       options = {};
+
     } else if( options.object !== undefined ){
       object = options.object;
       delete options.object;
@@ -321,12 +367,29 @@ function partial(view, options){
   name = options.as || resolveObjectName(view);
 
   // find view, relative to this filename
-  // (FIXME: filename is set by ejs engine, other engines may need more help)
-  var root = dirname(options.filename)
+  var root = _getDefaultLoadPath(options)
     , file = lookup(root, view, options)
     , key = file + ':string';
-  if( !file )
-    throw new Error('Could not find partial ' + view);
+
+  // File not found. Display debug help.
+  if( !file ){
+    /**
+     * Display all paths that have been tried.
+     */
+
+    console.error('Could not find partial"' + view + '"\nSearched for the following paths:');
+
+    for(var i in partialUnresolvedPaths){
+      console.error('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + ']');
+    }
+
+    // Terminate process.
+    throw new Error('Could not find partial"' + view + '"');
+  }else{
+    for(var i in partialUnresolvedPaths){
+      console.log('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + '] was tried but not found.');
+    }
+  }
 
   // read view
   var source = options.cache
@@ -377,6 +440,7 @@ function partial(view, options){
       len = keys.length;
       options.collectionLength = len;
       options.collectionKeys = keys;
+
       for (i = 0; i < len; ++i) {
         prop = keys[i];
         val = collection[prop];
@@ -396,125 +460,36 @@ function partial(view, options){
 }
 
 /**
- * Apply the given `view` as the layout for the current template,
- * using the current options/locals. The current template will be
- * supplied to the given `view` as `body`, along with any `blocks`
- * added by child templates.
+ * Retrieve the default path used by the application views.
+ * Either the app.set('views', __dirname + '/views'); hs been set, or we fallback using our own:"process.cwd() + '/views'".
  *
- * `options` are bound  to `this` in renderFile, you just call
- * `layout('myview')`
- *
- * @param  {String} view
- * @api private
+ * @param options
+ * @return {*|string}
+ * @private
  */
-function layout(view){
-  this.locals._layoutFile = view;
+function _getDefaultLoadPath(options){
+  return options._settings.views || process.cwd() + '/views';
 }
 
 /**
- * A Block object, used to store HTML content in order to display it anywhere.
- * @constructor
- */
-function Block() {
-  this.html = [];
-}
-
-/**
- * Append function to the Block object by prototype.
- */
-Block.prototype = {
-
-  /**
-   * Convert HTML to string.
-   * @return {string}
-   */
-  toString: function() {
-    return this.html.join('\n');
-  },
-
-  /**
-   * Append a new HTML block.
-   * @param more
-   */
-  append: function(more) {
-    this.html.push(more);
-  },
-
-  /**
-   * Prepend an HTML block, so it's like append it but at the beginning of the array.
-   * @param more
-   */
-  prepend: function(more) {
-    this.html.unshift(more);
-  },
-
-  /**
-   * Replace the whole HTML block by a new array.
-   * @param instead
-   */
-  replace: function(instead) {
-    this.html = [ instead ];
-  }
-};
-
-/**
- * Return the block with the given name, create it if necessary.
- * Optionally append the given html to the block.
+ * Check if the file exists. If it does, log it. If it doesn't add the path to the array of unresolved paths.
  *
- * The returned Block can append, prepend or replace the block,
- * as well as render it when included in a parent template.
- *
- * @param  {String} name
- * @param  {String} html
- * @return {Block}
- * @api private
+ * @param partial   Partial path sent.
+ * @param file      Partial path tested.
+ * @param type      Type of the test. (absolute, relative, ...)
+ * @return {*}
+ * @private
  */
-function block(name, html) {
-  // bound to the blocks object in renderFile
-  var blk = this[name];
-  if (!blk) {
-    // always create, so if we request a
-    // non-existent block we'll get a new one
-    blk = this[name] = new Block();
+function _fileExists(partial, file, type){
+  if (exists(file)){
+    console.log('"'+partial+'" found at "'+file+'" ['+type+']');
+    return true;
   }
-  if (html) {
-    blk.append(html);
-  }
-  return blk;
-}
 
-/**
- * A convenience function for `block('scripts', '<script src="src.js"></script>')` with optional type.
- * When called anywhere inside a template, adds a script tag with the given src/type to the scripts block.
- * In the layout you can then do `<%-scripts%> to output the scripts from all the child templates.
- * This function in bound to the scripts Block from the `renderFile` function.
- *
- * @param path
- * @param media
- * @return {script}
- * @api public
- */
-function script(path, type) {
-  if (path) {
-    this.append('<script src="'+path+'"'+(type ? 'type="'+type+'"' : '')+'></script>');
-  }
-  return this;
-}
+  partialUnresolvedPaths.push({
+    type: type,
+    file: file
+  });
 
-/**
- * A convenience function for `block('stylesheets', '<link rel="stylesheet" href="href.css" />')` with optional media type.
- * When called anywhere inside a template, adds a link tag for the stylesheet with the given href/media to the stylesheets block.
- * In the layout you can then do `<%-stylesheets%> to output the links from all the child templates.
- * This function in bound to the stylesheets Block from the `renderFile` function.
- *
- * @param path
- * @param media
- * @return {stylesheet}
- * @api public
- */
-function stylesheet(path, media) {
-  if (path) {
-    this.append('<link rel="stylesheet" href="'+path+'"'+(media ? 'media="'+media+'"' : '')+' />');
-  }
-  return this;
+  return false;
 }

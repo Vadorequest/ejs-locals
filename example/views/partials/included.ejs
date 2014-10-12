@@ -1,0 +1,9 @@
+<p>
+    This content has been loaded using the <b>include</b> ejs operator. <i>Using <b>include</b> will make any use of the partial function bug using relative paths. Much better to use <b>partial()</b> actually.</i><br>
+
+    <code>partial('partials2/absolute')</code> would fail because this file has been loaded by <b>include</b> operator.<br>
+    <code>partial('/views/partials/partials2/absolute')</code> works:
+
+    <%- partial('/partials/partials2/absolute') %>
+</p>
+
