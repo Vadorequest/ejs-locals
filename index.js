@@ -366,7 +366,7 @@ function partial(view, options){
 
   // find view, relative to this filename
   // (FIXME: filename is set by ejs engine, other engines may need more help)
-  var root = _getDefaultLoadPath(options)
+  var root = join(_getDefaultLoadPath(options), view.slice(1))
     , file = lookup(root, view, options)
     , key = file + ':string';
 
@@ -441,6 +441,14 @@ function partial(view, options){
   }
 }
 
+/**
+ * Retrieve the default path used by the application.
+ * Either the app.set('views', __dirname + '/views'); hs been set, or we fallback using our own:"process.cwd() + '/views'".
+ *
+ * @param options
+ * @return {*|string}
+ * @private
+ */
 function _getDefaultLoadPath(options){
   return (options.settings.views || process.cwd() + '/views');
 }
