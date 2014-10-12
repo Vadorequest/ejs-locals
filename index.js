@@ -481,6 +481,6 @@ function _fileExists(partial, file){
     return true;
   }
 
-  partialUnresolvedPaths.push(partial);
+  partialUnresolvedPaths.push(file);
   return false;
 }
