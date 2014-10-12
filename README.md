@@ -257,6 +257,7 @@ In the layout you can then do `<%-scripts%> to output the scripts from all the c
 **The second parameters can also be an object.**
 
 `<% script('/foo.js') -%>` will generate `<script src="/foo.js" type="text/javascript"></script>`
+
 `<% script('/foo.js', {type: 'text/javascript', id: 'script-foo'}) -%>` will generate `<script src="/foo.js" type="text/javascript" id="script-foo"></script>`
 
 ### `stylesheet(href, parameters)`
@@ -267,7 +268,9 @@ In the layout you can then do `<%-stylesheets%> to output the links from all the
 **The second parameters can also be an object.**
 
 `<% stylesheet('/foo.css') -%>` will generate `<link rel="stylesheet" href="/foo.css">`
+
 `<% stylesheet('/foo.css', 'print') -%>` will generate `<link rel="stylesheet" href="/foo.css" media="print">`
+
 `<% stylesheet('/foo.css', {type: 'text/css', id: 'stylesheet-foo'}) -%>` will generate `<link rel="stylesheet" href="/foo.css" type="text/css" id="stylesheet-foo">`
 
 ## Debug support
@@ -278,6 +281,16 @@ I prefer doing so for the moment so we are able to see if the file loaded is the
 Feel free to make a PR with some kind of settings to disable it, I didn't get any idea other than checking the `environment` but I would like to have log in production too,
 I don't think that's the best way. We need something independent, not related to the env.
 - When a file to load fails to be found, all paths tested are now displayed in the server console as `error`.
+
+## Specific attributes
+*This list is probably not complete, I didn't run into every case but I will detail here all the specific attributes that you **should not use***.
+
+1. While rendering a view:
+    - locals._layoutFile: Used to set the layout to use. Set to false to disable.
+    - locals.body: Contains the content of a view when used in a layout. If you override this, you're gonna regret it. https://github.com/RandomEtc/ejs-locals/issues/22
+2. While loading a partial `partial(view, options)`
+    - options.cache: I'm not sure what it is, seems that we can enable/disable the cache on a specific partial.
+    I read somewhere that it was enabled in production. Anyway, I would recommend to avoid using this key, excepted if you understand what it does.
 
 ## Template Support
   - `ejs` (actually hard coded right now, but feel free to __fork and help!__)
