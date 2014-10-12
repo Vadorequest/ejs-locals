@@ -244,7 +244,7 @@ function lookup(root, partial, options){
       }
     }
 
-    // Try to resolve using default config.
+    // Try to resolve using Express config or default config.
     if(_fileExists(partial, file = resolve(_getDefaultLoadPath(options), partial + ext), 'absolute(default)')){
       return options.cache ? cache[key] = file : file
     }

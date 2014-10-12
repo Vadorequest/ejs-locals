@@ -13,7 +13,7 @@ app.set('view engine', 'ejs'); // so you can render('index')
 // render 'index' into 'boilerplate':
 app.get('/',function(req, res, next){
   // The fact that we send _basePath from here, it will be bound automatically to each call to `partial`, not useful to specify it again. But possible to override it to set a custom _basePath for a specific call.
-  res.render('index', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ], _basePath: __dirname });
+  res.render('index', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ], base: __dirname });
 });
 
 /**

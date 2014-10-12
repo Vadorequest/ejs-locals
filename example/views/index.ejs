@@ -10,9 +10,9 @@
 <% include partials/included %>
 
 <%- partial('partials/relative', {text: "Loaded using: <code>partial('partials/relative.ejs')</code>"}) %>
-<%- partial('/partials/absolute.ejs', {text: "Loaded using: <code>partial('/partials/absolute.ejs')</code>"}) %>
-<%- partial('/views/partials/absolute', {text: "Loaded using: <code>partial('/views/partials/absolute.ejs')</code>"}) %>
-<%- partial('/views/partials/absolute.ejs', {text: "Loaded using: <code>partial('/views/partials/absolute.ejs')</code>"}) %>
+<%- partial('/partials/absolute.ejs', {text: "Loaded using: <code>partial('/partials/absolute.ejs')</code>. Used <b>Express</b> configuration to find the view."}) %>
+<%- partial('/partials/absolute', {text: "Loaded using: <code>partial('/partials/absolute')</code>. Used <b>Express</b> configuration to find the view."}) %>
+<%- partial('/views/partials/absolute.ejs', {text: "Loaded using: <code>partial('/views/partials/absolute.ejs', {_basePath: base})</code>. Used <b><code>_basePath</code></b> value to find the view.", _basePath: base}) %>
 
 <hr/>
 <h1>Partials with variables</h1>
