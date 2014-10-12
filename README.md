@@ -22,8 +22,23 @@ Previously also offered `include` but you should use EJS 0.8.x's own method for 
 
 *(`--save` automatically writes to your `package.json` file, tell your friends)*
 
+### Proper setup
+If you want to use a smart and reusable `absolute path`, here is how **it should be done**.
+
+#### Using Express.js
+This is the smarter solution. Just set the following when setting your `express` application: `app.set('views', __dirname + '/views')` even if I guess that's already done!
+Every use of absolute path (I.e: `partial('/partials/absolute')` will take the `views` folder as root.
+
+#### Without Express.js
+If you're not using Express, then you could set when you're rendering a view the following: `res.render('index', { _basePath: __dirname });`,
+it would be shared across every partial loaded by the view and you would not need to precise the `_basePath` while calling `partial()`.
+
+Of course this can be a *pain in the ass* if you need to change every call to `res.render`, I myself don't,
+I prefer to use the **Express** configuration and when I can't I have a bunch of default values bound in every view dynamically, so I don't even have to think about it.
+
+
 ## Usage
-Run `node app.js` from `examples` and open `localhost:3000` to see a working example.
+Run `node app.js` from `examples` folder and open `localhost:3000` to see a working example.
 
 Given a template, `views/index.ejs`:
 
@@ -40,8 +55,10 @@ Given a template, `views/index.ejs`:
     <!-- Using include will make any use of the partial function bug using relative paths. Much better to use partial actually. -->
     <% include partials/included %>
 
-    <%- partial('partials/relative.ejs') %>
-    <%- partial('/views/partials/absolute.ejs', {_basePath: _basePath}) %>
+    <%- partial('partials/relative', {text: "Loaded using: <code>partial('partials/relative.ejs')</code>"}) %>
+    <%- partial('/partials/absolute.ejs', {text: "Loaded using: <code>partial('/partials/absolute.ejs')</code>. Used <b>Express</b> configuration to find the view."}) %>
+    <%- partial('/partials/absolute', {text: "Loaded using: <code>partial('/partials/absolute')</code>. Used <b>Express</b> configuration to find the view."}) %>
+    <%- partial('/views/partials/absolute.ejs', {text: "Loaded using: <code>partial('/views/partials/absolute.ejs', {_basePath: base})</code>. Used <b><code>_basePath</code></b> value to find the view.", _basePath: base}) %>
 
     <hr/>
     <h1>Partials with variables</h1>
@@ -111,7 +128,8 @@ When rendered by an Express 3.0 app, `app.js`:
 
     // render 'index' into 'boilerplate':
     app.get('/',function(req, res, next){
-      res.render('index', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ], _basePath: __dirname });
+      // The fact that we send _basePath from here, it will be bound automatically to each call to `partial`, not useful to specify it again. But possible to override it to set a custom _basePath for a specific call.
+      res.render('index', { what: 'best', who: 'me', muppets: [ 'Kermit', 'Fozzie', 'Gonzo' ], base: __dirname });
     });
 
     /**
@@ -123,96 +141,10 @@ When rendered by an Express 3.0 app, `app.js`:
      * Start the application on a specific port.
      */
     app.listen(3000);
+
 ```
 
 You get the following result: (See [Picture](rendered.png))
-
-```html
-
-    <!DOCTYPE html>
-    <html><script type="text/javascript" src="chrome-extension://kajfghlhfkcocafkcjlajldicbikpgnp/catcher.js"><!-- script injected by Request Maker --></script><head>
-        <title>It's me</title>
-        <script src="/foo.js" type="text/javascript"></script><style type="text/css"></style><style type="text/css"></style>
-        <link rel="stylesheet" href="/foo.css">
-      </head>
-      <body>
-        <header>
-          <p>I'm in the header.</p>
-        </header>
-        <section>
-
-    <h1>Partials, include and local variables</h1>
-
-    <b>I am the best template</b>
-
-    <!-- Using include will make any use of the partial function bug using relative paths. Much better to use partial actually. -->
-    <p>
-        This content has been loaded using the <b>include</b> ejs operator. <i>Using <b>include</b> will make any use of the partial function bug using relative paths. Much better to use <b>partial()</b> actually.</i><br>
-
-        <code>partial('partials2/absolute')</code> would fail because this file has been loaded by <b>include</b> operator.<br>
-        <code>partial('/views/partials/partials2/absolute', {_basePath: _basePath})</code> works:
-
-        </p><p style="margin-left: 20px">
-        This content has been loaded from an <b>absolute</b> path, because it is not possible to load it from a relative path, gets fucked up by the use of <b>include</b>.
-    </p>
-    <p>
-        This content has been loaded from an <b>relative</b> path.
-        </p><p style="margin-left: 20px">
-        This content has been loaded using the <b>include</b> ejs operator from a file loaded using the <b>partial()</b> function.
-        It works fine, but we cannot load any file using <b>include</b> operator anymore using relative path, we need to use absolute to make it work.
-    </p>
-        <p style="margin-left: 20px">
-        This content has been loaded from an <b>relative</b> path. Relative paths work fine when we don't use the <b>include</b> operator but the <b>partial()</b> function instead.
-    </p>
-    <p>
-        This content has been loaded from an <b>absolute</b> path.
-    </p>
-
-    <hr>
-    <h1>Partials with variables</h1>
-
-        <p>Here are some muppets we know about:
-            </p><ul>
-                <li>Kermit</li><li>Fozzie</li><li>Gonzo</li>
-            </ul>
-        <p></p>
-
-        <p>
-            It's not often we iterate over the Muppets twice, but in this case it seems prudent to try from 'extras.ejs':
-
-            </p>
-                <ul>
-                    <li>Kermit</li><li>Fozzie</li><li>Gonzo</li>
-                </ul>
-            <p>
-        </p>
-
-    <hr>
-    <h1>Templates</h1>
-
-        <div id="box_" class="box">
-
-                <div class="header">
-                        <span class="title">My box!</span>
-                    <hr>
-                </div>
-
-            <div class="content">
-                <div><b>Box content!</b></div>
-            </div>
-        </div>
-
-    <hr>
-    <h1>Blocks, JS and CSS</h1>
-
-        <p class="better-than-dead">I'm red if foo.css was loaded.</p>    </section>
-            <footer>
-              <p>I'm in the footer.</p>
-            </footer>
-
-        <p>P.S. foo.js was successfully loaded</p></body></html>
-```
-Note, if you haven't seen it before, this example uses trailing dashes in the EJS includes to slurp trailing whitespace and generate cleaner HTML. It's not strictly necessary.
 
 
 ## Features
