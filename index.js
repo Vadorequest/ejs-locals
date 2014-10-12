@@ -239,21 +239,15 @@ function lookup(root, partial, options){
 
     // Try to resolve using options._basePath, if set. Allows to override any kind of config, in case the path lookup wouldn't take the expected one.
     if(options._basePath){
-      file = resolve(options._basePath, partial + ext);
-      if( exists(file) ){
-        console.log('"'+partial+'" found at "'+file+'"');
-        return options.cache ? cache[key] = file : file;
+      if(_fileExists(partial, file = resolve(options._basePath, partial + ext))){
+        return options.cache ? cache[key] = file : file
       }
-      partialUnresolvedPaths.push(file);
     }
 
     // Try to resolve using default config.
-    file = resolve(_getDefaultLoadPath(options), partial + ext);
-    if( exists(file) ){
-      console.log('"'+partial+'" found at "'+file+'"');
-      return options.cache ? cache[key] = file : file;
+    if(_fileExists(partial, file = resolve(_getDefaultLoadPath(options), partial + ext))){
+      return options.cache ? cache[key] = file : file
     }
-    partialUnresolvedPaths.push(file);
   }
 
   // filename is set by ejs engine
@@ -261,30 +255,21 @@ function lookup(root, partial, options){
 
   // Try relative partial with "_". Takes precedence over the direct path
   // ex: for partial('user') look for /root/user.ejs
-  file = resolve(relativeRoot, dir, '_'+base+ext);
-  if (exists(file)){
-    console.log('"'+partial+'" found at "'+file+'"');
-    return options.cache ? cache[key] = file : file;
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, '_' + base + ext))) {
+    return options.cache ? cache[key] = file : file
   }
-  partialUnresolvedPaths.push(partial);
 
   // Try relative
   // ex: for partial('user') look for /root/user.ejs
-  file = resolve(relativeRoot, dir, base+ext);
-  if (exists(file)){
-    console.log('"'+partial+'" found at "'+file+'"');
-    return options.cache ? cache[key] = file : file;
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, base + ext))) {
+    return options.cache ? cache[key] = file : file
   }
-  partialUnresolvedPaths.push(partial);
 
   // Try relative index
   // ex: for partial('user') look for /root/user/index.ejs, but only if there is not /root/user.ejs
-  file = resolve(relativeRoot, dir, base, 'index'+ext);
-  if (exists(file)){
-    console.log('"'+partial+'" found at "'+file+'"');
-    return options.cache ? cache[key] = file : file;
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, base, 'index' + ext))) {
+    return options.cache ? cache[key] = file : file
   }
-  partialUnresolvedPaths.push(partial);
 
   // FIXME:
   // * there are other path types that Express 2.0 used to support but
@@ -480,4 +465,22 @@ function partial(view, options){
  */
 function _getDefaultLoadPath(options){
   return options._settings.views || process.cwd() + '/views';
+}
+
+/**
+ * Check if the file exists. If it does, log it. If it doesn't add the path to the array of unresolved paths.
+ *
+ * @param partial
+ * @param file
+ * @return {*}
+ * @private
+ */
+function _fileExists(partial, file){
+  if (exists(file)){
+    console.log('"'+partial+'" found at "'+file+'"');
+    return true;
+  }
+
+  partialUnresolvedPaths.push(partial);
+  return false;
 }
