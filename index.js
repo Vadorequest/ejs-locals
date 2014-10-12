@@ -468,5 +468,5 @@ function partial(view, options){
  * @private
  */
 function _getDefaultLoadPath(options){
-  return (options._settings.views || process.cwd() + '/views');
+  return options._settings.views || process.cwd() + '/views';
 }
