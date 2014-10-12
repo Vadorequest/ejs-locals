@@ -268,6 +268,13 @@ In the layout you can then do `<%-stylesheets%> to output the links from all the
 `<% stylesheet('/foo.css', 'print') -%>` will generate `<link rel="stylesheet" href="/foo.css" media="print">`
 `<% stylesheet('/foo.css', {type: 'text/css', id: 'stylesheet-foo'}) -%>` will generate `<link rel="stylesheet" href="/foo.css" type="text/css" id="stylesheet-foo">`
 
+## Debug support
+In order to help developers using this library I have made a couple of changes:
+
+- Every successful partial found is written in the server console as `log`. If I can understand that it could be boring due to a lot of views loaded,
+I prefer doing so for the moment so we are able to see if the file loaded is the one we want to, especially now that I don't trust the lookup system 100%.
+- When a file to load fails to be found, all paths tested are now displayed in the server console as `error`.
+
 ## Template Support
   - `ejs` (actually hard coded right now, but feel free to __fork and help!__)
 
