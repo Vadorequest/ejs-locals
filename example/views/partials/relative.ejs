@@ -1,5 +1,9 @@
 <p>
-    This content has been loaded from an <b>relative</b> path.
+    This content has been loaded from an <b>relative</b> path.<br>
+
+    <% if(typeof text !== 'undefined'){%>
+    <%- text%>
+    <%}%>
 
     <% include partials2/included%>
 
