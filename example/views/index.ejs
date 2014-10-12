@@ -7,8 +7,8 @@
 <!-- Using include will make any use of the partial function bug using relative paths. Much better to use partial actually. -->
 <% include partials/included %>
 
-<%- partial('partials/relative') %>
-<%- partial('/views/partials/absolute', {_basePath: _basePath}) %>
+<%- partial('partials/relative.ejs') %>
+<%- partial('/views/partials/absolute.ejs', {_basePath: _basePath}) %>
 
 <hr/>
 

@@ -211,6 +211,9 @@ function lookup(root, partial, options){
     , ext = extname(partial) || desiredExt
     , key = [ root, options._basePath ? options._basePath : '', partial, ext ].join('-');
 
+  // Delete any eventual extension equal to the view engine extension to makes sure that even a file loaded using "partial('foo.ejs')" works.
+  partial = path.dirname(partial) + '/' + path.basename(partial, ext);
+
   if (options.cache && cache[key]) return cache[key];
 
   // Make sure we use dirname in case of relative partials
