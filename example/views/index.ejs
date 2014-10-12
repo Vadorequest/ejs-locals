@@ -9,9 +9,10 @@
 <!-- Using include will make any use of the partial function bug using relative paths. Much better to use partial actually. -->
 <% include partials/included %>
 
-<%- partial('partials/relative.ejs', {text: "Loaded using: <code>partial('partials/relative.ejs')</code>"}) %>
+<%- partial('partials/relative', {text: "Loaded using: <code>partial('partials/relative.ejs')</code>"}) %>
 <%- partial('/partials/absolute.ejs', {text: "Loaded using: <code>partial('/partials/absolute.ejs')</code>"}) %>
-<%- partial('/views/partials/absolute.ejs', {text: "Loaded using: <code>partial('/views/partials/absolute.ejs')</code>"}) %>
+<%- partial('/views/partials/absolute', {text: "Loaded using: <code>partial('/views/partials/absolute.ejs')</code>"}) %>
+<%- partial('/views/partials/absolute.ejs', {_basePath: _basePath, text: "Loaded using: <code>partial('/views/partials/absolute.ejs')</code>"}) %>
 
 <hr/>
 <h1>Partials with variables</h1>
