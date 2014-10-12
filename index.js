@@ -218,6 +218,11 @@ function lookup(root, partial, options){
   var dir = dirname(partial)
     , base = basename(partial, ext);
 
+  /**
+   * Try to resolve different kind of paths.
+   * Try absolute if partial name starts with "/" then fallback to different relative ways.
+   */
+
   // If the first char of the partial path is a slash (/) then try to load the file using the absolute mode.
   if(partial.substr(0, 1) == '/'){
 
@@ -250,6 +255,17 @@ function lookup(root, partial, options){
   // ex: for partial('user') look for /root/user/index.ejs
   partial = resolve(root, dir, base, 'index'+ext);
   if( exists(partial) ) return options.cache ? cache[key] = partial : partial;
+
+  // Try relative
+  // filename is set by ejs engine
+  var relativeRoot = dirname(options.filename);
+  partial = resolve(relativeRoot, dir, base+ext);
+  if (exists(partial)) return options.cache ? cache[key] = partial : partial;
+
+  // Try relative index
+  // ex: for partial('user') look for /root/user/index.ejs, but only if there is not /root/user.ejs
+  partial = resolve(relativeRoot, dir, base, 'index'+ext);
+  if (exists(partial)) return options.cache ? cache[key] = partial : partial;
 
   // FIXME:
   // * there are other path types that Express 2.0 used to support but
@@ -342,7 +358,7 @@ function partial(view, options){
 
   // find view, relative to this filename
   // (FIXME: filename is set by ejs engine, other engines may need more help)
-  var root = dirname(options.filename)
+  var root = (options.settings.views || process.cwd() + '/views')
     , file = lookup(root, view, options)
     , key = file + ':string';
 
