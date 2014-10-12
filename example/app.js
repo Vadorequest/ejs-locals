@@ -8,6 +8,7 @@ app.engine('ejs', ejsLocals);
 
 // Path resolving will be using this setting to resolve paths during fallback.
 app.set('views', __dirname + '/views');
+app.set('templates', __dirname + '/views/templates');
 app.set('view engine', 'ejs'); // so you can render('index')
 
 // render 'index' into 'boilerplate':

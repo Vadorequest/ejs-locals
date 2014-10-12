@@ -1,0 +1,13 @@
+<% icon = typeof icon != 'undefined' ? icon : false%>
+
+<% if(icon) {%>
+    <% if(icon) {%>
+        <% if(typeof icon == 'function') {%>
+            <%= icon()%>
+        <% }else if(typeof complex != 'undefined' && complex == true){ %>
+            <%= icon%>
+        <% }else{ %>
+            <i class="fa <%= icon%>"></i>
+        <% } %>
+    <% } %>
+<% } %>
