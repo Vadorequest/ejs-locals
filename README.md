@@ -13,8 +13,10 @@ Express 3.x `layout`, `partial` and `block` template functions for the EJS templ
 
 Previously also offered `include` but you should use EJS 0.8.x's own method for that now.
 
+**Note:** This library is backward compatible with the original `ejs-locals`. You can just change it in your program and everything should work just fine.
+
 ## Installation
-`$ npm install ejs-locals --save`
+`$ npm install ejs-locals-vadorequest --save`
 
 *(`--save` automatically writes to your `package.json` file, tell your friends)*
 
