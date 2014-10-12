@@ -16,6 +16,7 @@ var ejs = require('ejs')
 /**
  * Load helpers.
  */
+require('./app/helpers/util');
 require('./app/helpers/block');
 require('./app/helpers/layout');
 

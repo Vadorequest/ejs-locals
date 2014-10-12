@@ -18,7 +18,12 @@
     </ul>
 </p>
 
-<%- partial('partials/extra') %>
+<%- partial('partials/extra', muppets) %>
+
+We load the same extra but with default values using the <b>defined('muppets', ['default1', 'default2'])</b> helper.
+<div style="margin-left: 20px">
+    <%- partial('partials/extra') %>
+</div>
 
 <% block('header', "<p>I'm in the header.</p>") %>
 <% block('footer', "<p>I'm in the footer.</p>") %>
