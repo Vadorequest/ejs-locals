@@ -239,13 +239,13 @@ function lookup(root, partial, options){
 
     // Try to resolve using options._basePath, if set. Allows to override any kind of config, in case the path lookup wouldn't take the expected one.
     if(options._basePath){
-      if(_fileExists(partial, file = resolve(options._basePath, partial + ext))){
+      if(_fileExists(partial, file = resolve(options._basePath, partial + ext), 'absolute(_basePath)')){
         return options.cache ? cache[key] = file : file
       }
     }
 
     // Try to resolve using default config.
-    if(_fileExists(partial, file = resolve(_getDefaultLoadPath(options), partial + ext))){
+    if(_fileExists(partial, file = resolve(_getDefaultLoadPath(options), partial + ext), 'absolute(default)')){
       return options.cache ? cache[key] = file : file
     }
   }
@@ -255,19 +255,19 @@ function lookup(root, partial, options){
 
   // Try relative partial with "_". Takes precedence over the direct path
   // ex: for partial('user') look for /root/user.ejs
-  if(_fileExists(partial, file = resolve(relativeRoot, dir, '_' + base + ext))) {
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, '_' + base + ext), 'relative(_)')) {
     return options.cache ? cache[key] = file : file
   }
 
   // Try relative
   // ex: for partial('user') look for /root/user.ejs
-  if(_fileExists(partial, file = resolve(relativeRoot, dir, base + ext))) {
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, base + ext), 'relative(default)')) {
     return options.cache ? cache[key] = file : file
   }
 
   // Try relative index
   // ex: for partial('user') look for /root/user/index.ejs, but only if there is not /root/user.ejs
-  if(_fileExists(partial, file = resolve(relativeRoot, dir, base, 'index' + ext))) {
+  if(_fileExists(partial, file = resolve(relativeRoot, dir, base, 'index' + ext), 'relative(index)')) {
     return options.cache ? cache[key] = file : file
   }
 
@@ -380,11 +380,15 @@ function partial(view, options){
     console.error('Could not find partial"' + view + '"\nSearched for the following paths:');
 
     for(var i in partialUnresolvedPaths){
-      console.error('------>"' + partialUnresolvedPaths[i] + '"');
+      console.error('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + ']');
     }
 
     // Terminate process.
     throw new Error('Could not find partial"' + view + '"');
+  }else{
+    for(var i in partialUnresolvedPaths){
+      console.log('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + '] was tried but not found.');
+    }
   }
 
   // read view
@@ -470,17 +474,22 @@ function _getDefaultLoadPath(options){
 /**
  * Check if the file exists. If it does, log it. If it doesn't add the path to the array of unresolved paths.
  *
- * @param partial
- * @param file
+ * @param partial   Partial path sent.
+ * @param file      Partial path tested.
+ * @param type      Type of the test. (absolute, relative, ...)
  * @return {*}
  * @private
  */
-function _fileExists(partial, file){
+function _fileExists(partial, file, type){
   if (exists(file)){
-    console.log('"'+partial+'" found at "'+file+'"');
+    console.log('"'+partial+'" found at "'+file+'" ['+type+']');
     return true;
   }
 
-  partialUnresolvedPaths.push(file);
+  partialUnresolvedPaths.push({
+    type: type,
+    file: file
+  });
+
   return false;
 }
