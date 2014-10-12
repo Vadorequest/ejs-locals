@@ -2,7 +2,9 @@
 <% script('/foo.js') -%>
 <% stylesheet('/foo.css') -%>
 
-<h1>I am the <%= what %> template</h1>
+<h1>Partials, include and local variables</h1>
+
+<b>I am the <%= what %> template</b>
 
 <!-- Using include will make any use of the partial function bug using relative paths. Much better to use partial actually. -->
 <% include partials/included %>
@@ -11,6 +13,7 @@
 <%- partial('/views/partials/absolute.ejs', {_basePath: _basePath}) %>
 
 <hr/>
+<h1>Partials with variables</h1>
 
 <p>Here are some muppets we know about:
     <ul>
@@ -20,9 +23,14 @@
 
 <%- partial('partials/extra') %>
 
-<% block('header', "<p>I'm in the header.</p>") %>
-<% block('footer', "<p>I'm in the footer.</p>") %>
+<hr/>
+<h1>Templates</h1>
+
 
 <hr/>
+<h1>Blocks, JS and CSS</h1>
+
+<% block('header', "<p>I'm in the header.</p>") %>
+<% block('footer', "<p>I'm in the footer.</p>") %>
 
 <p class="better-than-dead">I'm red if foo.css was loaded.</p>
