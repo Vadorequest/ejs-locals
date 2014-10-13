@@ -13,7 +13,7 @@
 - [Template support](#template-support): Node.js template engine supported.
 - [Tests](#running-tests): How to run the tests?
 - [Backwards compatibility](#backwards-compatibility): A small talk about backward compatibility.
-- [`Include` or `partial`?](#contributing): Why using `include` is **bad** and will give you headaches.
+- [`Include` or `partial`?](#using-include-over-partial): Why using `include` is **bad** and will give you headaches.
 - [Contributing](#contributing)
 - [Roadmap](#roadmap)
 - [Credits](#credits)
