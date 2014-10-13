@@ -377,14 +377,14 @@ function partial(view, options){
      * Display all paths that have been tried.
      */
 
-    console.error('Could not find partial"' + view + '"\nSearched for the following paths:');
+    console.error('Could not find partial "' + view + '"\nSearched for the following paths:');
 
     for(var i in partialUnresolvedPaths){
       console.error('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + ']');
     }
 
     // Terminate process.
-    throw new Error('Could not find partial"' + view + '"');
+    throw new Error('Could not find partial "' + view + '"');
   }else{
     for(var i in partialUnresolvedPaths){
       console.log('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + '] was tried but not found.');
