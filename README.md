@@ -1,7 +1,7 @@
 # ejs-locals
 
 ## Status
-This is my own library for `ejs-locals` from https://github.com/RandomEtc/ejs-locals.
+This is my own library that replaces `ejs-locals` from https://github.com/RandomEtc/ejs-locals.
 The original lib is unmaintained so I have made some improvements, mostly based on what I need since I don't understand exactly how everything works there.
 
 Anyway, if you want small edit/features I should be able to do it, just open an issue.
@@ -12,9 +12,18 @@ Or better: **Make a PR**. (see **Contributing.md**)
 ## About
 Express 3.x `layout`, `partial` and `block` template functions for the EJS template engine.
 
-Previously also offered `include` but you should use EJS 0.8.x's own method for that now.
+Previously also offered `include` but you should use EJS 0.8.x's own method for that now. **And you shouldn't the use of `include` and `partial` because of bugs, just use `partial`**
 
 **Note:** This library is backward compatible with the original `ejs-locals`. You can just change it in your program and everything should work just fine.
+
+
+## Summary of the features added to the original *ejs-locals*
+- Absolute paths based on *Express views* or *custom* configuration.
+- When a `partial` call fails, show the stacks of tried paths so you can figure out what's wrong.
+- When a `partial` call success, show the loaded partial and every single tried paths so you can makes sure it loads the right one. *(not possible to disable this yet)*
+- Optional argument for `script` and `stylesheet` helpers to generate html properties with default values.
+
+*Features are explained [below](#features), if you believe it lacks of documentation please open an issue.*
 
 
 ## Installation
@@ -259,10 +268,6 @@ I don't think that's the best way. We need something independent, not related to
   - `ejs` (actually hard coded right now, but feel free to __fork and help!__)
 
 
-## TODO
- **See TODO.md**
-
-
 ## Running Tests
 To run the test suite first invoke the following command within the repo, installing the development dependencies:
 `$ npm install -d`
@@ -294,5 +299,17 @@ If you want to test it, there are tests in my `example`, just read them and figu
 Anyway `include` isn't as useful as `partial` so I won't bother anymore.**
 
 
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+
+## Roadmap
+See [ROADMAP.md](ROADMAP.md).
+
+
 ## Credits
 This library is a fork from [ejs-locals](https://github.com/RandomEtc/ejs-locals) which is unmaintained.
+
+
+## License
+See [LICENSE.md](LICENSE.md).
