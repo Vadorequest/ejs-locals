@@ -2,7 +2,7 @@
   "author": "Vadorequest",
   "name": "ejs-locals-vadorequest",
   "description": "Express 3.x locals for layout, partial and blocks.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/Vadorequest/ejs-locals"
