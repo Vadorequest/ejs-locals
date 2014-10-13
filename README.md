@@ -1,5 +1,25 @@
 # ejs-locals
 
+## Table of contents
+- [Status](#status): What the current status of the library is?
+- [About](#about): What the library is made for?
+- [Features summary](#summary-of-the-features-added-to-the-original-ejs-locals): What features are available that aren't in the original `ejs-locals`?
+- [Installation](#installation): How to install the library?
+- [Proper setup](#proper-setup): How to properly setup absolute path finding?
+- [Usage](#usage): How to use the lib? With examples.
+- [Features](#features): Deep explanation of the features.
+- [Debug](#debug-support): Tips and explanation about how to debug.
+- [Specific attributes](#specific-attributes): Specific attributes used by the library that you should be aware about.
+- [Template support](#template-support): Node.js template engine supported.
+- [Tests](#running-tests): How to run the tests?
+- [Backwards compatibility](#backwards-compatibility): A small talk about backward compatibility.
+- [`Include` or `partial`?](#contributing): Why using `include` is **bad** and will give you headaches.
+- [Contributing](#contributing)
+- [Roadmap](#roadmap)
+- [Credits](#credits)
+- [License](#license)
+
+
 ## Status
 This is my own library that replaces `ejs-locals` from https://github.com/RandomEtc/ejs-locals.
 The original lib is unmaintained so I have made some improvements, mostly based on what I need since I don't understand exactly how everything works there.
@@ -10,9 +30,9 @@ Or better: **Make a PR**. (see **Contributing.md**)
 
 
 ## About
-Express 3.x `layout`, `partial` and `block` template functions for the EJS template engine.
+Express 3.x `layout`, `partial` and `block` template functions for the **EJS template engine**.
 
-Previously also offered `include` but you should use EJS 0.8.x's own method for that now. **And you shouldn't the use of `include` and `partial` because of bugs, just use `partial`**
+Previously also offered `include` but you should use EJS 0.8.x's own method for that now. **And you shouldn't the use of `include` and `partial` because of bugs, just use `partial`, read more at [`Include` or `partial`?](#contributing)**
 
 **Note:** This library is backward compatible with the original `ejs-locals`. You can just change it in your program and everything should work just fine.
 
@@ -286,7 +306,7 @@ Express 2.0 had similar functionality built in, using `{ layout: 'view' }` as an
 And/or pass `_layoutFile: true` in the options when you call `res.render(...)`.
 
 
-## Whither Include? - *NOT RECOMMENDED*
+## Using `include` over `partial`?
 Previous versions of this library had an `include` function. This is now supported directly by EJS, albeit with a different syntax. For `ejs-locals` 1.0+ simply do:
 
 `<% include path/view %>`
@@ -294,7 +314,7 @@ Previous versions of this library had an `include` function. This is now support
 When called anywhere inside a template, this adds the given view to that template using the current options and locals. This is built-in to [EJS](https://github.com/visionmedia/ejs) 0.8+.
 
 **I warn you here, know that every file loaded through `include` will not be able to load files using the `partial()` function with relative path,
-it is just broken. Since `include` belongs to EJS and `partials` belongs to `ejs-locals` they are NOT friendly.
+it is just broken *(path resolve fails)*. Since `include` belongs to EJS and `partials` belongs to `ejs-locals` they are NOT friendly.
 If you want to test it, there are tests in my `example`, just read them and figure it out by yourself.
 Anyway `include` isn't as useful as `partial` so I won't bother anymore.**
 
