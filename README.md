@@ -210,7 +210,6 @@ To use the absolute way you will need to make it start by a dash (`/`).
 
 In any case you can force the base path by doing the following: `partial('/partials/absolute', {_basePath: your_base_path})`.
 Using the `_basePath` attribute you will force the base path, so if for some reason the lookup system that loads a view mess up you are able to force the path this way.
-*(I don't trust it 100% yet, it works but if you got a lot of partials with the same name I would not bet that he would select the right one... Need to look into it deeply.)*.
 
 ##### Resolve *absolute* file order
 There is a specific order while trying to resolve a path using the `partial` function. Here is the description taking as example the following `partial('/partials/absolute')` from the file `c:\wamp\www\ejs-locals\example\index.ejs`:
@@ -223,7 +222,7 @@ There is a specific order while trying to resolve a path using the `partial` fun
 
 As you can see, the **fallback** here isn't really useful. I actually don't know if I should improve it or not, and I don't know how to. It's kinda hard to fallback from absolute to relative and I'm afraid the program would be wrong most of the time actually.
 
-So, probably better this way, or completely remove fallback from absolute to relative paths. Feel free to guide me here.
+So, probably better this way, or completely remove fallback from absolute to relative paths. *Feel free to guide me here.*
 
 
 #### Load partial with relative path
