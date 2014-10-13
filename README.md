@@ -8,6 +8,11 @@
 - [Proper setup](#proper-setup): How to properly setup absolute path finding?
 - [Usage](#usage): How to use the lib? With examples.
 - [Features](#features): Deep explanation of the features.
+    - [layout](#layoutview)
+    - [partial](#partialname-optionsorcollection)
+    - [block](#blockname-html)
+    - [script](#scriptsrc-parameters)
+    - [stylesheet](#stylesheethref-parameters)
 - [Debug](#debug-support): Tips and explanation about how to debug.
 - [Specific attributes](#specific-attributes): Specific attributes used by the library that you should be aware about.
 - [Template support](#template-support): Node.js template engine supported.
