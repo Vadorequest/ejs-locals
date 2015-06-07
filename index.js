@@ -175,14 +175,14 @@ var cache = {};
  */
 function resolveObjectName(view){
   return cache[view] || (cache[view] = view
-    .split('/')
-    .slice(-1)[0]
-    .split('.')[0]
-    .replace(/^_/, '')
-    .replace(/[^a-zA-Z0-9 ]+/g, ' ')
-    .split(/ +/).map(function(word, i){
-      return i ? word[0].toUpperCase() + word.substr(1) : word;
-    }).join(''));
+      .split('/')
+      .slice(-1)[0]
+      .split('.')[0]
+      .replace(/^_/, '')
+      .replace(/[^a-zA-Z0-9 ]+/g, ' ')
+      .split(/ +/).map(function(word, i){
+        return i ? word[0].toUpperCase() + word.substr(1) : word;
+      }).join(''));
 }
 
 /**
@@ -387,7 +387,7 @@ function partial(view, options){
     throw new Error('Could not find partial "' + view + '"');
   }else{
     for(var i in partialUnresolvedPaths){
-      console.log('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + '] was tried but not found.');
+      //console.log('------>"' + partialUnresolvedPaths[i].file + '" [' + partialUnresolvedPaths[i].type + '] was tried but not found.');
     }
   }
 
@@ -482,7 +482,7 @@ function _getDefaultLoadPath(options){
  */
 function _fileExists(partial, file, type){
   if (exists(file)){
-    console.log('"'+partial+'" found at "'+file+'" ['+type+']');
+    //console.log('"'+partial+'" found at "'+file+'" ['+type+']');
     return true;
   }
 
